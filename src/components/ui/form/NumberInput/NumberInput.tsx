@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { TextInputProps } from '@/types/TextInputProps';
+import React, { useState, useEffect } from "react"
+import { NumberInputProps } from "@/types"
 
-import { InputWrapper,  Label, Input, InputError  } from '../globalFormStyles';
+import { InputWrapper, Label, Input, InputError } from '../globalFormStyles';
 
-
-const TextInput: React.FC<TextInputProps> = ({
+const NumberInput: React.FC<NumberInputProps> = ({
     modelValue = '',
     placeholder = '',
     inputId = null,
@@ -20,11 +19,11 @@ const TextInput: React.FC<TextInputProps> = ({
     onBlur,
     onError,
 }) => {
-    const [inputData, setInputData] = useState(modelValue);
+    const [inputData, setInputData] = useState<string>(modelValue.toString());
     const [errorText, setErrorText] = useState<string | null>(null);
 
     useEffect(() => {
-        setInputData(modelValue);
+        setInputData(modelValue !== undefined && modelValue !== null ? modelValue.toString() : '');
     }, [modelValue]);
 
     useEffect(() => {
@@ -35,36 +34,41 @@ const TextInput: React.FC<TextInputProps> = ({
 
     useEffect(() => {
         if (checkIsValid) {
-            validateData(inputData);
+            validateData(inputData === '' ? undefined : parseFloat(inputData));
         }
-    }, [checkIsValid]);
+    }, [checkIsValid, inputData]);
 
     const clearField = () => {
         setInputData('');
         setErrorText(null);
-        onUpdateModelValue('');
-        onInput?.('');
-        onBlur?.('');
+        if (onUpdateModelValue) onUpdateModelValue(0);
+        if (onInput) onInput(0); 
+        if (onBlur) onBlur(0); 
     };
 
     const eventInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value.trim() || '';
-        setErrorText(null);
-        onUpdateModelValue(value);
-        onInput?.(value);
+        const value = e.target.value.trim();
+        if (!/^\d*\.?\d*$/.test(value)) return;
+
+        const numericValue = value === '' ? 0 : parseFloat(value);
+
+        setInputData(value);
+        if (onBlur) onBlur(numericValue);
+        validateData(numericValue);
     };
 
     const eventBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-        let value = e.target.value.trim() || '';
-        value = value.replace(/\s+/g, ' ').trim();
+        const value = e.target.value.trim();
+        const numericValue = value === '' ? 0 : parseFloat(value);
+
         setInputData(value);
-        onBlur?.(value);
-        validateData(value);
+        if (onBlur) onBlur(numericValue);
+        validateData(numericValue);
     };
 
-    const validateData = (v: string) => {
+    const validateData = (v?: number) => {
         if (rules && rules.length) {
-            const errTxt = rules.map(f => f(v)).find(itm => itm !== true);
+            const errTxt = rules.map(f => f(v ?? 0)).find(itm => itm !== true);
             if (errTxt) {
                 setErrorText(errTxt as string);
                 onError?.(true);
@@ -78,8 +82,9 @@ const TextInput: React.FC<TextInputProps> = ({
         onError?.(false);
     };
 
+
     return (
-        <InputWrapper className="input-box text-input">
+        <InputWrapper className="input-box number-input">
             <Input
                 className={errorText ? 'valid-err' : ''}
                 value={inputData}
@@ -97,7 +102,7 @@ const TextInput: React.FC<TextInputProps> = ({
             {label && <Label className='input-label' htmlFor={inputId || undefined}>{label}</Label>}
             {errorText && <InputError className="input-error">{errorText}</InputError>}
         </InputWrapper>
-    );
-};
+    )
+}
 
-export default TextInput;
+export default NumberInput;

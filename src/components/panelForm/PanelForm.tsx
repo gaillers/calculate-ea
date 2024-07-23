@@ -1,27 +1,46 @@
 import { useEffect, useState } from 'react';
-import { TextInput } from '@components/ui';
+import { TextInput, NumberInput, PhoneInput } from '@components/ui';
 import { rules } from '@/validation';
 
 import { PanelFormWrapper } from './PanelFormStyle'
 
 const PanelForm: React.FC = () => {
-    const [value, setValue] = useState('');
+    const [textValue, setTextValue] = useState('');
+    const [numberValue, setNumberValue] = useState<number | string>();
+    const [phoneValue, setPhoneValue] = useState<number | string>();
     const [isValid, setIsValid] = useState(false);
 
     useEffect(() => {
-        setValue(value);
-    }, [value]);
+        setTextValue(textValue);
+    }, [textValue]);
 
-    const handleUpdateModelValue = (newValue: string) => {
-        setValue(newValue);
+    useEffect(() => {
+        setNumberValue(numberValue);
+    }, [numberValue]);
+
+    useEffect(() => {
+        setPhoneValue(phoneValue);
+    }, [phoneValue]);
+
+
+    const handleUpdateTextModelValue = (newValue: string) => {
+        setTextValue(newValue);
     };
 
-    const handleInput = (newValue: string) => {
-        // You mentioned wanting to remove console logs, so ensure this is intentional
+    const handleUpdateNumberModelValue = (newValue: number) => {
+        setNumberValue(newValue);
     };
 
-    const handleBlur = (newValue: string) => {
-        // You mentioned wanting to remove console logs, so ensure this is intentional
+    const handleUpdatePhoneModelValue = (newValue: string) => {
+        setPhoneValue(newValue);
+    };
+
+    const handleInput = (newValue: string | number) => {
+        // Intentionally left blank
+    };
+
+    const handleBlur = (newValue: string | number) => {
+        // Intentionally left blank
     };
 
     const handleError = (hasError: boolean) => {
@@ -31,7 +50,7 @@ const PanelForm: React.FC = () => {
     return (
         <PanelFormWrapper>
             <TextInput
-                modelValue={value}
+                modelValue={textValue}
                 placeholder=""
                 label="Name"
                 clear={false}
@@ -39,11 +58,41 @@ const PanelForm: React.FC = () => {
                 checkIsValid={true}
                 required={true}
                 rules={rules.text}
-                onUpdateModelValue={handleUpdateModelValue}
+                onUpdateModelValue={handleUpdateTextModelValue}
                 onInput={handleInput}
                 onBlur={handleBlur}
                 onError={handleError}
             />
+            <NumberInput
+                modelValue={numberValue}
+                placeholder=""
+                label="Number"
+                clear={false}
+                disabled={false}
+                checkIsValid={true}
+                maxLength={6}
+                rules={rules.numbers}
+                onUpdateModelValue={handleUpdateNumberModelValue}
+                onInput={handleInput}
+                onBlur={handleBlur}
+                onError={handleError}
+            />
+
+            <PhoneInput
+                modalValue={''}
+                placeholder=""
+                label="Phone"
+                clear={false}
+                disabled={false}
+                checkIsValid={true}
+                maxLength={14}
+                rules={rules.phone}
+                onUpdateModelValue={handleUpdatePhoneModelValue}
+                onInput={handleInput}
+                onBlur={handleBlur}
+                onError={handleError}
+            />
+
         </PanelFormWrapper>
     )
 }

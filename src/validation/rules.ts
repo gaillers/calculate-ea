@@ -1,37 +1,50 @@
-type ValidationRule = (value: string) => true | string;
+type ValidationRule<T> = (value: T) => true | any;
 
 interface ValidationRules {
-    text: ValidationRule[];
-    textarea: ValidationRule[];
-    numbers: ValidationRule[];
-    textOnlyLetters: ValidationRule[];
-    requiredText: ValidationRule[];
-    companyName: ValidationRule[];
-    longText: ValidationRule[];
-    longRequiredText: ValidationRule[];
-    login: ValidationRule[];
-    password: ValidationRule[];
-    email: ValidationRule[];
-    requiredEmail: ValidationRule[];
-    url: ValidationRule[];
-    phone: ValidationRule[];
+    text: ValidationRule<string>[];
+    textarea: ValidationRule<string>[];
+    numbers: ValidationRule<number>[];
+    textOnlyLetters: ValidationRule<string>[];
+    requiredText: ValidationRule<string>[];
+    companyName: ValidationRule<string>[];
+    longText: ValidationRule<string>[];
+    longRequiredText: ValidationRule<string>[];
+    login: ValidationRule<string>[];
+    password: ValidationRule<string>[];
+    email: ValidationRule<string>[];
+    requiredEmail: ValidationRule<string>[];
+    url: ValidationRule<string>[];
+    phone: ValidationRule<any>[];
 }
 
-const requiredValidate: ValidationRule = (v) => !!v || 'Required field';
-const latinValidate: ValidationRule = (v) => !!v && /^[a-z.]+$/.test(v) || 'Requires Latin without symbols, spaces and numbers, only lowercase';
-const textValidate: ValidationRule = (v) => !!v && /^[a-zA-Z0-9а-яА-ЯёЁ\s\.\,\!\?\-\:\r\n]+$/ig.test(v) || 'The text should not contain characters';
-const textValidateNumbers: ValidationRule = (v) => !!v && /^\d+$/.test(v) || 'The text should contain only numbers';
-const textNoRequiredValidate: ValidationRule = (v) => !v || /^[a-zA-Z0-9а-яА-ЯёЁ\s\.\,\!\?\-\:\r\n]+$/ig.test(v) || 'The text should not contain characters';
-const textOnlyLettersValidate: ValidationRule = (v) => !v || /^[a-zA-Zа-яА-ЯёЁ\s\-]+$/g.test(v) || 'The text should contain only letters';
-const passwordValidate: ValidationRule = (v) => !!v && /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])/.test(v) || 'Required without spaces Latin, uppercase and lowercase letters and numbers';
-const emailValidate: ValidationRule = (v) => !!v && /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,4})+$/.test(v) || 'Error found in E-mail';
-const emailNoRequiredValidate: ValidationRule = (v) => !v || /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,4})+$/.test(v) || 'Error found in E-mail';
+const requiredValidate: ValidationRule<string> = (v) => !!v || 'Required field';
+const latinValidate: ValidationRule<string> = (v) => !!v && /^[a-z.]+$/.test(v) || 'Requires Latin without symbols, spaces and numbers, only lowercase';
+const textValidate: ValidationRule<string> = (v) => !!v && /^[a-zA-Z0-9а-яА-ЯёЁ\s\.\,\!\?\-\:\r\n]+$/ig.test(v) || 'The text should not contain characters';
+const textValidateNumbers: ValidationRule<number> = (v) => !isNaN(v) || 'The value should be a number';
+const textNoRequiredValidate: ValidationRule<string> = (v) => !v || /^[a-zA-Z0-9а-яА-ЯёЁ\s\.\,\!\?\-\:\r\n]+$/ig.test(v) || 'The text should not contain characters';
+const textOnlyLettersValidate: ValidationRule<string> = (v) => !v || /^[a-zA-Zа-яА-ЯёЁ\s\-]+$/g.test(v) || 'The text should contain only letters';
+const passwordValidate: ValidationRule<string> = (v) => !!v && /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])/.test(v) || 'Required without spaces Latin, uppercase and lowercase letters and numbers';
+const emailValidate: ValidationRule<string> = (v) => !!v && /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,4})+$/.test(v) || 'Error found in E-mail';
+const emailNoRequiredValidate: ValidationRule<string> = (v) => !v || /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,4})+$/.test(v) || 'Error found in E-mail';
 
-const moreThenValidate = (cnt: number): ValidationRule => (v) => !!v && v.length > cnt || 'More than ' + cnt + ' characters required';
-const moreThenNoRequiredValidate = (cnt: number): ValidationRule => (v) => !v || v.length > cnt || 'More than ' + cnt + ' characters required';
-const lessThenValidate = (cnt: number): ValidationRule => (v) => !!v && v.length < cnt || 'Less than ' + cnt + ' characters required';
-const lessThenNoRequiredValidate = (cnt: number): ValidationRule => (v) => !v || v.length < cnt || 'Less than ' + cnt + ' characters required';
-const phoneValidate = (cnt: number): ValidationRule => (v) => !!v && v.length > cnt || 'Phone number is invalid';
+const moreThenValidate = (cnt: number): ValidationRule<string> => (v) => !!v && v.length > cnt || 'More than ' + cnt + ' characters required';
+const moreThenNoRequiredValidate = (cnt: number): ValidationRule<string> => (v) => !v || v.length > cnt || 'More than ' + cnt + ' characters required';
+const lessThenValidate = (cnt: number): ValidationRule<string> => (v) => !!v && v.length < cnt || 'Less than ' + cnt + ' characters required';
+const lessThenNoRequiredValidate = (cnt: number): ValidationRule<string> => (v) => !v || v.length < cnt || 'Less than ' + cnt + ' characters required';
+
+const phoneValidate = (cnt: number): ValidationRule<string> => (v: string) => {
+    const cleaned = v.replace(/\D/g, '');
+    if (cleaned.length === 0) return true;
+    return cleaned.length >= cnt || `Phone number entered is not correct`;
+};
+
+const phoneValidateDigits = (cnt: number): ValidationRule<string> => (v: string) => {
+    const cleaned = v.replace(/\D/g, '');
+    const isValidLength = cleaned.length >= cnt;
+    const isValidFormat = /^\d{10,14}$/.test(cleaned);
+    if (cleaned.length === 0) return true;
+    return isValidLength && isValidFormat || `Please enter a valid phone number with at least ${cnt} digits`;
+};
 
 const rules: ValidationRules = {
     text: [
@@ -47,7 +60,6 @@ const rules: ValidationRules = {
     ],
     numbers: [
         textValidateNumbers,
-        textNoRequiredValidate
     ],
     textOnlyLetters: [
         requiredValidate,
@@ -106,8 +118,8 @@ const rules: ValidationRules = {
         (v) => !v || /^(https?\:\/\/|\/\/)(www\.)?([a-z0-9\.\-]+)\.([a-z]{2,4})+([a-z0-9%\/.-_?&=\[\]#:]+)?$/i.test(v) || 'Error in URL'
     ],
     phone: [
-        requiredValidate,
-        phoneValidate(13)
+        phoneValidate(10),
+        phoneValidateDigits(10),
     ],
 };
 

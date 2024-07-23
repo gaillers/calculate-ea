@@ -40,7 +40,11 @@ export const Input = styled.input`
     outline: none;
 
     &::placeholder {
-        color: transparent; /* Hide placeholder */
+        color: transparent;
+    }
+
+    &:not(:placeholder-shown) {
+        border: 1px solid #28aae1;
     }
 
     &:focus + ${Label},
@@ -48,6 +52,10 @@ export const Input = styled.input`
         color: #7899b3;
         font-size: 14px;
         transform: translate(-20px, -34px);
+    }
+
+    &.valid-err {
+        border: 1px solid red;
     }
 
     @media (max-width: 1180px) {
