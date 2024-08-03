@@ -1,17 +1,17 @@
 // config.ts
-export const base_url = "//api.new-expedite-all.loc";
-export const site_base_url = "//expediteall-refactored.loc";
+export const base_url = import.meta.env.VITE_BASE_URL;
+export const site_base_url = import.meta.env.VITE_SITE_BASE_URL;
 
 export const calc_form_data = {
     base_url: base_url,
     site_base_url: site_base_url,
 
-    call_back_ep: "http://api.new-expedite-all.loc",
+    call_back_ep: import.meta.env.VITE_CALL_BACK_EP,
 
-    wp_ajax_url: site_base_url + "/wp-admin/admin-ajax.php",
-    wp_calc_api: site_base_url + "/wp-content/themes/expediteall/calculator-api",
+    wp_ajax_url: import.meta.env.VITE_WP_AJAX_URL,
+    wp_calc_api: import.meta.env.VITE_WP_CALC_API,
 
-    images_folder: "/wp-content/form-data/form-images/",
+    images_folder: import.meta.env.VITE_IMAGES_FOLDER,
 
     usr_id: "4f6f466dad8736ac8e3f0ed368ceddc245",
     usr_ip: "254.128.25.29",
@@ -59,7 +59,7 @@ export const calc_options = {
     truck_type_error_text: "Please select some type of track",
     truck_distance_html: "The distance between <strong>{origin}</strong> and <strong>{destination}</strong> is <strong>{distance}</strong> miles.",
     please_wait: "Please wait,<br/>loading data",
-    
+
     step_2_title: "Enter your load information",
     pieces: "Pieces / Pallets",
     weight: "Weight",
